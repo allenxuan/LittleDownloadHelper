@@ -5,6 +5,7 @@
 ####LittleDownloadHelper is a simple utility helping construct background download service on Android Platform.
 
 ##Screenshot
+
 ![demo1](/art/littledownloadhelperdemo.gif)
 
 ##Gradle Dependency
