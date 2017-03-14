@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void destroyDownloadService(View v){
-        littleDownloadHelper.destroyDownloadService();
+        littleDownloadHelper.destroyDownloadService(this);
     }
 
 

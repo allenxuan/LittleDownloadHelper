@@ -40,11 +40,19 @@ public class LittleDownloadHelper {
 
     private Intent serviceIntent;
 
+    private boolean destroyServiceAfterConnected = false;
+
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            downloadBinder = (DownloadService.DownloadBinder) service;
-            serviceConnectFlag = true;
+            if(destroyServiceAfterConnected){
+                destroyServiceAfterConnected = false;
+                serviceHostContext.unbindService(serviceConnection);
+                serviceHostContext.stopService(serviceIntent);
+            }else {
+                downloadBinder = (DownloadService.DownloadBinder) service;
+                serviceConnectFlag = true;
+            }
         }
 
         @Override
@@ -73,12 +81,20 @@ public class LittleDownloadHelper {
         return this;
     }
 
-    public void destroyDownloadService(){
+    public void destroyDownloadService(Context context){
+        serviceHostContext = context;
+        serviceIntent = new Intent(serviceHostContext, DownloadService.class);
+        if(serviceConnectFlag) {
             serviceHostContext.unbindService(serviceConnection);
             serviceHostContext.stopService(serviceIntent);
             downloadBinder.cancelDownload(true);
             downloadBinder = null;
             serviceConnectFlag = false;
+        }else{
+            serviceHostContext.startService(serviceIntent);
+            serviceHostContext.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
+            destroyServiceAfterConnected = true;
+        }
     }
 
     public LittleDownloadHelper useNotificationTargetActivity(Class activity){
@@ -140,6 +156,12 @@ public class LittleDownloadHelper {
     public void cancelDownload(){
         if(serviceConnectFlag)
             downloadBinder.cancelDownload(false);
+    }
+
+    public interface DownloadStatusCallback{
+         void onStarted();
+         void onPaused();
+         void onCanceled();
     }
 
 }
