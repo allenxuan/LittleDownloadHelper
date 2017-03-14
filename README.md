@@ -6,6 +6,7 @@
 #### LittleDownloadHelper is a simple utility helping construct background download service on Android Platform.
 
 ## Screenshot
+![demo1](/art/littledownloadhelperdemo.gif)
 
 ## Gradle Dependency
 This library is available on JCenter, so you need add this to your project's build.gradle (usually it is already there by default).
@@ -24,7 +25,7 @@ dependencies {
 ```
 
 ## How To Use
-#### get a LittleDownloadHelper instance
+### Get a LittleDownloadHelper instance.
 ```
 LittleDownloadHelper littleDownloadHelper = new LittleDownloadHelper();
 ```
@@ -33,7 +34,7 @@ or
 LittleDownloadHelper littleDownloadHelper = new LittleDownloadHelper(context);
 ```
 
-#### initialize background download service to prepare for upcoming download task
+### Initialize background download service to prepare for upcoming download task.
 ```
 littleDownloadHelper.initDownloadService(context);
 ```
@@ -42,9 +43,9 @@ or
 littleDownloadHelper.initDownloadService();
 ```
 
-##### Notice 1: a context should be passed to littleDownloadHelper in either constructor or initDownloadService().
+#### Notice 1: a context should be passed to littleDownloadHelper in either constructor or initDownloadService().
 
-#### start a download task
+### Start a download task.
 ```
 String url = "http://dl.hdslb.com/mobile/latest/iBiliPlayer-bili.apk";
 littleDownloadHelper
@@ -62,37 +63,36 @@ littleDownloadHelper
      .useNotificationSmallIcon(R.drawable.ic_notification)
      .startDownload(url);
 ```
-##### Notice 2: notification SmallIcon must be set.
-##### Notice 3: there are 3 types of DownloadProgressHint: PERCENT_STYLE, FRACTION_STYLE and FRACTION_AND_PERCENT_TOGETHER, default value is  FRACTION_STYLE.
-##### Notice 4: download url can be set via setDownloadUrl(url) or startDownload(url)
+#### Notice 2: notification SmallIcon must be set.
+#### Notice 3: there are 3 types of DownloadProgressHint: PERCENT_STYLE, FRACTION_STYLE and FRACTION_AND_PERCENT_TOGETHER, default value is  FRACTION_STYLE.
+#### Notice 4: download url can be set via setDownloadUrl(url) or startDownload(url)
 
-#### pause the download task
+### Pause the download task.
 ```
 littleDownloadHelper.pauseDownload();
 ```
 
-#### cancel the download task
+### Cancel the download task.
 ```
 littleDownloadHelper.cancelDownload();
 ```
 
-#### remove the background download service
+### Remove the background download service.
 if you are sure that background download service is not needed any longer, invoke this function properly.
 ```
 littleDownloadHelper.destroyDownloadService(context);
 ```
 
-##### Notice 5: if your context host is killed, such as your app is crashed unexpectedly, and you've not invoked destroyDownloadService(context) yet,
-##### then background download service continues running. How can you take control of download service again?
-##### you merely need to get a LittleDownloadHelper instance again，
+#### Notice 5: if your context host is killed, such as your app is crashed unexpectedly, and you've not invoked destroyDownloadService(context) yet, then background download service continues running. How can you take control of download service again?
+you merely need to get a LittleDownloadHelper instance again，
 ```
 LittleDownloadHelper littleDownloadHelper = new LittleDownloadHelper();
 ```
-##### initialize download service to get communication with it,
+initialize download service to get communication with it,
 ```
 littleDownloadHelper.initDownloadService(context);
 ```
-#### now you can control download service again by pauseDownload(), cancelDownload() or destroyDownloadService().
+now you can control download service again by pauseDownload(), cancelDownload() or destroyDownloadService().
 
 # License
 ```
