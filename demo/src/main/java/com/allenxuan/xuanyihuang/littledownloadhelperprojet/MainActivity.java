@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         littleDownloadHelper = new LittleDownloadHelper();
+        littleDownloadHelper.initDownloadService(this);
     }
 
 
