@@ -1,130 +1,168 @@
-# Explain
----
-This library is built for powerful display of web contents within your application. Specifically, it helps
-you launch the Chrome custom tabs when it's available, quote:
->As of Chrome 45, Chrome custom tabs is now generally available to all users of Chrome, 
->on all of Chrome's supported Android versions (Jellybean onwards).
-[Chrome Custom Tabs](https://developer.chrome.com/multidevice/android/customtabs)
+#XuanImageView
+[![Platform](https://img.shields.io/badge/Platform-Android-green.svg)](https://developer.android.com/index.html)
+[![License](https://img.shields.io/badge/License-Apache%202.0-red.svg)](http://www.apache.org/licenses/LICENSE-2.0)
+####XuanImageView extends ImageView with scaling function, rotating function, ect. Particularly, its auto-rotate-back-to-initial-state behavior mimics that in Google Photo.
 
-When Chrome custom tabs is not available, it helps you launch the FinestWebView which is
-a beautiful and customizable Android Activity that shows web pages within an app.
+##Screenshot
+####Auto-rotate category: RESTORATION
+![demo1](/screenshots/XuanImageViewDemo.gif)
 
-You can say this library is a hybrid of the following two projects:
+####Auto-rotate category: MAGNETISM
+![demo2](/screenshots/XuanImageViewDemo2.gif)
 
-- [custom-tabs-client](https://github.com/GoogleChrome/custom-tabs-client)
-- [FinestWebView-Android](https://github.com/TheFinestArtist/FinestWebView-Android)
+##XuanImageView demo video - YouTube
+<a href="https://youtu.be/inPvol4oUjY" target="_blank">
+  <img alt="Youtube"
+       src="/art/youtube_icon.png"
+       width="20%">
+</a>
 
-#Add gradle dependency:
----
-This library is available on both JCenter and MavenCentral, so you just need
-add this to your build.gradle
-```
-dependencies {
-    compile 'com.github.allenxuan:ShowPowerfulWeb:0.7.0'
-    }
-```
+##Get demo app
+Demo app is available on Googl Play :
 
-#Basic Usage:
----
-##Create CustomTabsIntent Builder
-```java
-CustomTabsIntent.Builder intentBuilder = new CustomTabsIntent.Builder();
-```
-##Customize toolbar color
-```java
-intentBuilder.setToolbarColor(color); //color is an int variable here.
-```
-or
-```java
-intentBuilder.setToolbarColor(Color.parseColor(color_string);  // color_string is a string of RGB color code here, e.g., #FF0000 for red.
-```
-##Set action button
-```java
-String shareLabel = getString(R.string.label_action_share);
-Bitmap icon = BitmapFactory.decodeResource(getResources(),
-                    android.R.drawable.ic_menu_share);     //Generally you do not want to decode bitmaps in the UI thread.
-PendingIntent pendingIntent = createPendingIntent();
-intentBuilder.setActionButton(icon, shareLabel, pendingIntent);
-```
-###createPendingIntent() can be this:
-```java
-private PendingIntent createPendingIntent() {
-        Intent actionIntent = new Intent(
-                this.getApplicationContext(), ShareBroadcastReceiver.class);
-        return PendingIntent.getBroadcast(getApplicationContext(), 0, actionIntent, 0);
-    }
-```
-or you may write your own createPendingIntent().
-##Add menu item
-```java
-String menuItemTitle = getString(R.string.menu_item_title);
-PendingIntent menuItemPendingIntent = createPendingIntent();
-intentBuilder.addMenuItem(menuItemTitle, menuItemPendingIntent);
-```
-##Show web title
-```java
-intentBuilder.setShowTitle(true);
-```
-##Enable Url bar hiding
-```java
-intentBuilder.enableUrlBarHiding();
-```
-##Set close button icon
-```java
- intentBuilder.setCloseButtonIcon(
-                    BitmapFactory.decodeResource(getResources(), R.drawable.ic_arrow_back)); //Generally you do not want to decode bitmaps in the UI thread.
-```
-##Set animations
-```java
-intentBuilder.setStartAnimations(this, R.anim.slide_in_right, R.anim.slide_out_left);
-intentBuilder.setExitAnimations(this, android.R.anim.slide_in_left,android.R.anim.slide_out_right);
-```
-##Launch Chrome custom tabs
-```java
-CustomTabActivityHelper.openCustomTab(
-                this, intentBuilder.build(), Uri.parse(url), new WebviewFallback());
-```
+<a href="https://play.google.com/store/apps/details?id=com.allenxuan.xuanyihuang.xuanimageviewproject" target="_blank">
+  <img alt="Google Play"
+       src="/art/get_it_on_googleplay.png"
+       width="20%"
+       >
+</a>
 
----
-If Chrome custom tabs is not available, a basic FinestWebView is launched then. Building your own WebviewFallback
-is recommended, like this
-```java
-public class MyOwnWebviewFallback implements CustomTabActivityHelper.CustomTabFallback {
-    @Override
-    public void openUri(Activity activity, Uri uri) {
+Or you can get demo apk under /demo/demo-release.apk.
 
-        new FinestWebView.Builder(activity)   //Please refer to https://github.com/TheFinestArtist/FinestWebView-Android
-            .toolbarScrollFlags(AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL | AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS)
-            .gradientDivider(false)
-            .dividerHeight(2)
-            .statusBarColorRes(R.color.accent);
-            .toolbarColorRes(R.color.accent)
-            .dividerColorRes(R.color.black_30)
-            .iconDefaultColorRes(R.color.accent)
-            .progressBarHeight(DipPixelHelper.getPixel(context, 3))
-            .progressBarColorRes(R.color.accent)
-            .backPressToClose(false)
-            .setCustomAnimations(R.anim.slide_left_in, R.anim.hold, R.anim.hold, R.anim.slide_right_out)
-            .show(uri.toString());
+##Compatibility:
+XuanImageView is now compatible with Glide, Picasso and other image loading libraries that use ImageView as image container.
+<br>
+Fresco's DraweeView is a descendant of Android [View](https://developer.android.com/reference/android/view/View.html) class, if you want extended functionality
+like scaling and rotating on it, I suggest that you search for other libraries compatible with Fresco.
+
+
+##Strategies:
+1. An image will be scaled and centered to fit the screen size at the very beginning (initial state).
+2. Double-tap triggers auto-scale behavior.
+3. If image's current scale level is bigger than maximum scale level or smaller than minimum scale level, the image will spring back to maximum scale level or minimum scale level.
+4. The Image can only start to be rotated when it's in initial state.
+5. Image will rotate back to initial state when rotation gesture is released.
+
+##Get started
+###Gradle dependency
+This library is available on JCenter, so you need add this to your project's build.gradle (usually it is already there by default).
+```
+allprojects {
+    repositories {
+        jcenter()
     }
 }
 ```
-then launch it
+and add this to your module's build.gradle.
+```
+dependencies {
+    compile 'com.github.allenxuan:xuanimageview:0.4.0'
+}
+```
+###Basic use (just like a normal ImageView)
+In xml, .e.g.,
+```xml
+<com.allenxuan.xuanyihuang.xuanimageview.XuanImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/wallpaper1" />
+```
+In code, e.g.,
 ```java
-CustomTabActivityHelper.openCustomTab(
-                this, intentBuilder.build(), Uri.parse(url), new MyOwnWebviewFallback());
+XuanImageView xuanImageView = new XuanImageView(context);
+xuanImageView.setImageResource(resId);
 ```
 
 
---- 
-For more customizations and information, please refer to these documents and code:
+##Available Setters
 
-- [Chrome Custom Tabs](https://developer.chrome.com/multidevice/android/customtabs)
-- [custom-tabs-client](https://github.com/GoogleChrome/custom-tabs-client)
-- [FinestWebView-Android](https://github.com/TheFinestArtist/FinestWebView-Android)
+###Available Setters in code
+####setRotationToggle(boolean toggle)
+Set a boolean value to determine whether rotation function is turned on.
+####setAutoRotateCategory(int category)
+Set AutoRotateCategory, there are two alternative values of it : XuanImageViewSettings.AUTO_ROTATE_CATEGORY_RESTORATION, XuanImageViewSettings.AUTO_ROTATE_CATEGORY_MAGNETISM.
+####setMaxScaleMultiple(float maxScaleMultiple)
+An image is scaled to an InitScale to fit the size of XuanImageView at the very beginning. MaxScale = MaxScaleMultiple * InitScale holds.
+####setDoubleTabScaleMultiple(float doubleTabScaleMultiple)
+DoubleTapScale = DoubleTabScaleMultiple * InitScale holds. when image's current scale level is smaller than DoubleTabScale, the image will scale up to DoubleTapScale if a double-tap gesture is detected.
+####setSpringBackGradientScaleUpLevel(float springBackGradientScaleUpLevel)
+If current scale level is smaller than InitScale and image is not in rotation state, the image will scale up to InitScale with SpringBackGradientScaleUpLevel step by step.
+Default springBackGradientScaleUpLevel is  1.01f.
+####setSpringBackGradientScaleDownLevel(float springBackGradientScaleDownLevel)
+If current scale level is bigger than MaxScale and image is not in rotation state, the image will scale down to MaxScale with SpringBackGradientScaleDownLevel step by step.
+Default springBackGradientScaleDownLevel is 0.99f.
+####setDoubleTapGradientScaleUpLevel(float doubleTapGradientScaleUpLevel)
+When image's current scale level is smaller than DoubleTabScale, the image will scale up to DoubleTapScale with DoubleTapGradientScaleUpLevel step by step if a double-tap gesture is detected.
+Default doubleTalGradientScaleUpLevel is 1.05f.
+####setDoubleTabGradientScaleDownLevel(float doubleTapGradientScaleDownLevel)
+When image's current scale level is bigger than DoubleTabScale, the image will scale down to InitScale with DoubleTapGradientScaleDownLevel step by step if a double-tap gesture is detected.
+Default doubleTabGradientScaleDownLevel is 0.95f.
+####setAutoRotationTrigger(float autoRotationTrigger)
+When image's current rotation angle is bigger than AutoRotationTrigger, the image will rotate in the same direction and scale back to it's initial state if rotation gesture is released.
+When image's current rotation angle is smaller than AutoRotationTrigger, the image will rotate in the opposite direction and scale back to it's initial state if rotation gesture is released.
+Default AutoRotationTrigger is 60 (degrees).
+####setSpringBackRunnableDelay(int springBackRunnableDelay)
+Default SpringBackRunnableDelay is 10 (milliseconds).
+####setDoubleTapScaleRunnableDelay(int delay)
+Default DoubleTapScaleRunnableDelay is 10 (milliseconds).
+####setAutoRotationRunnableDelay(int delay)
+Default AutoRotationRunnableDelay is 5 (milliseconds).
+####setAutoRotationRunnableTimes(int times)
+Default AutoRotationRunnableTimes is 10 (times).
+
+###Available Setters in xml
+```xml
+<com.allenxuan.xuanyihuang.xuanimageview.XuanImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/wallpaper1"
+        android:scaleType="matrix"
+        android:background="@android:color/background_dark"
+        app:RotationToggle="boolean value"
+        app:AutoRotateCategory="int value (1 for AUTO_ROTATE_CATEGORY_RESTORATION, 2 for AUTO_ROTATE_CATEGORY_MAGNETISM)"
+        app:MaxScaleMultiple="float value"
+        app:DoubleTabScaleMultiple="float value"
+        app:SpringBackGradientScaleUpLevel="float value"
+        app:SpringBackGradientScaleDownLevel="float value"
+        app:DoubleTapGradientScaleUpLevel="float value"
+        app:DoubleTapGradientScaleDownLevel="float value"
+        app:AutoRotationTrigger="float value"
+        app:SpringBackRunnableDelay="int value"
+        app:DoubleTapScaleRunnableDelay="int value"
+        app:AutoRotationRunnableDelay="int value"
+        app:AutoRotationRunnableTimes="int value"
+        />
+```
+
+##Available Getters (in code)
+#### getRotationToggle()
+return current RotationToggle.
+####getAutoRotateCategory()
+return current AutoRotateCategory.
+####getMaxScaleMultiple()
+Return current MaxScaleMultiple.
+####getDoubleTabScaleMultiple()
+Return current DoubleTabScaleMultiple.
+####getSpringBackGradientScaleUpLevel()
+Return current SpringBackGradientScaleUpLevel.
+####getSpringBackGradientScaleDownLevel()
+Return current SpringBackGradientScaleDownLevel.
+####getDoubleTapGradientScaleUpLevel()
+Return current DoubleTapGradientScaleUpLevel.
+####getDoubleTapGradientScaleDownLevel()
+Return current DoubleTapGradientScaleDownLevel.
+####getAutoRotationTrigger()
+Return current AutoRotationTrigger.
+####getSpringBackRunnableDelay()
+Return springBackRunnableDelay;
+####getDoubleTabScaleRunnableDelay()
+Return doubleTabScaleRunnableDelay.
+####getAutoRotationRunnalbleDelay()
+return current AutoRotationRunnableDelay.
+####getAutoRotationRunnableTimes()
+Return current AutoRotationRunnableTimes.
 
 #License
-
 ```
 Copyright 2016 Xuanyi Huang
 
@@ -140,7 +178,3 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ```
-
-
-
-
