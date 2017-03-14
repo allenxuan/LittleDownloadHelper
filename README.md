@@ -9,7 +9,7 @@
 <a href="" target="_blank">
   <img alt="demo"
        src="/art/littledownloadhelperdemo.gif"
-       height="30%">
+       width="30%">
 </a>
 
 ## Gradle Dependency
