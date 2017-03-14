@@ -6,7 +6,6 @@
 
 ##Screenshot
 
-![demo1](/art/littledownloadhelperdemo.gif)
 
 ##Gradle Dependency
 This library is available on JCenter, so you need add this to your project's build.gradle (usually it is already there by default).
