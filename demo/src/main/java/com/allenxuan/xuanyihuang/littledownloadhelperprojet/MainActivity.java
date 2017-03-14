@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import com.allenxuan.xuanyihuang.littledownloadhelper.DownloadProgressHintStyle;
 import com.allenxuan.xuanyihuang.littledownloadhelper.LittleDownloadHelper;
 
 public class MainActivity extends AppCompatActivity {
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
         .setDownloadUrl(url)
                 .useNotificationSmallIcon(R.drawable.ic_notification)
                 .useNotificationTargetActivity(MainActivity.class)
+                .useDownloadProgressHintStyle(DownloadProgressHintStyle.FRACTION_AND_PERCENT_TOGETHER)
                 .startDownload();
     }
 

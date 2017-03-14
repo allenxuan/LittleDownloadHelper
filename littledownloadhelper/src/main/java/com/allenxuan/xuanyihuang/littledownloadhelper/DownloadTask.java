@@ -31,6 +31,10 @@ class DownloadTask extends AsyncTask<String, Integer, Integer> {
 
     private int lastProgress;
 
+    private float fileSize;
+
+    private String fileSizeUnit;
+
     DownloadTask(DownloadListener listener){
         this.listener = listener;
     }
@@ -61,6 +65,7 @@ class DownloadTask extends AsyncTask<String, Integer, Integer> {
             if(contentLength == downloadedLength){
                 return TYPE_SUCCESS;
             }
+            setFileSizeAndUnit(contentLength);
             OkHttpClient client = new OkHttpClient();
             Request request = new Request.Builder()
                     //breakpoint download
@@ -136,7 +141,7 @@ class DownloadTask extends AsyncTask<String, Integer, Integer> {
     protected void onProgressUpdate(Integer... values) {
         int progress = values[0];
         if(progress > lastProgress){
-            listener.onProgress(progress);
+            listener.onProgress(progress, fileSize, fileSizeUnit);
             lastProgress = progress;
         }
     }
@@ -161,5 +166,24 @@ class DownloadTask extends AsyncTask<String, Integer, Integer> {
             return  contentLength;
         }
         return  0;
+    }
+
+    private void setFileSizeAndUnit(long contentLength){
+        if(contentLength / 1024 == 0){
+            fileSize = contentLength;
+            fileSizeUnit = "B";
+        }
+        else if((contentLength / 1024 > 0) && (contentLength / 1024 / 1024 == 0)){
+            fileSize = (float) (contentLength / 1024.0);
+            fileSizeUnit = "K";
+        }
+        else if((contentLength / 1024 / 1024 > 0) && (contentLength / 1024 / 1024 / 1024 == 0)){
+            fileSize = (float) (contentLength / 1024.0 / 1024);
+            fileSizeUnit = "M";
+        }
+        else if(contentLength / 1024 / 1024 / 1024 > 0){
+            fileSize = (float) (contentLength / 1024.0 / 1024 / 1024);
+            fileSizeUnit = "G";
+        }
     }
 }

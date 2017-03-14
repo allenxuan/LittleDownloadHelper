@@ -28,8 +28,8 @@ public class DownloadService extends Service {
 
     private  DownloadListener downloadListener = new DownloadListener() {
         @Override
-        public void onProgress(int progress) {
-            getNotificationManager().notify(1, getNotification(getExhibitedFileName() + " (Downloading...)", progress));
+        public void onProgress(int progress, float fileSize, String fileSizeUnit) {
+            getNotificationManager().notify(1, getNotification(getExhibitedFileName(), progress, fileSize, fileSizeUnit));
         }
 
         @Override
@@ -38,8 +38,8 @@ public class DownloadService extends Service {
             //stop foreground download notification
             stopForeground(true);
             //create a download-success notification
-            getNotificationManager().notify(1, getNotification(getExhibitedFileName() +" (Download Success)", -1));
-            Toast.makeText(DownloadService.this, "Download Success", Toast.LENGTH_LONG).show();
+            getNotificationManager().notify(1, getNotification(getExhibitedFileName() +" (Download Success)"));
+            Toast.makeText(DownloadService.this, "Download Success", Toast.LENGTH_SHORT).show();
         }
 
         @Override
@@ -48,22 +48,22 @@ public class DownloadService extends Service {
             //stop foreground download notification
             stopForeground(true);
             //create a download-failed notification
-            getNotificationManager().notify(1, getNotification(getExhibitedFileName() + " (Download Failed)", -1));
-            Toast.makeText(DownloadService.this, "Download Failed", Toast.LENGTH_LONG).show();
+            getNotificationManager().notify(1, getNotification(getExhibitedFileName() + " (Download Failed)"));
+            Toast.makeText(DownloadService.this, "Download Failed", Toast.LENGTH_SHORT).show();
         }
 
         @Override
         public void onPaused() {
             downloadTask = null;
-            getNotificationManager().notify(1, getNotification(getExhibitedFileName() + " (Download Paused)", -1));
-            Toast.makeText(DownloadService.this, "Paused", Toast.LENGTH_LONG).show();
+            getNotificationManager().notify(1, getNotification(getExhibitedFileName() + " (Download Paused)"));
+            Toast.makeText(DownloadService.this, "Download Paused", Toast.LENGTH_SHORT).show();
         }
 
         @Override
         public void onCanceled() {
             downloadTask = null;
             stopForeground(true);
-            Toast.makeText(DownloadService.this, "Canceled", Toast.LENGTH_LONG).show();
+            Toast.makeText(DownloadService.this, "Download Canceled", Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -76,6 +76,7 @@ public class DownloadService extends Service {
     private boolean useNotificationTargetActivity = false;
     private boolean useNotificationSmallIcon = false;
     private boolean useNotificationLargeIcon = false;
+    private int downloadProgressHintStyle = DownloadProgressHintStyle.FRACTION_STYLE;
 
 
     @Override
@@ -92,8 +93,8 @@ public class DownloadService extends Service {
                 downloadTask = new DownloadTask(downloadListener);
                 downloadTask.execute(downloadUrl);
                 notificationCreateTime = System.currentTimeMillis();
-                startForeground(1, getNotification(getExhibitedFileName() + " (Downloading...)",0));
-                Toast.makeText(DownloadService.this,"Downloading...",Toast.LENGTH_LONG).show();
+                startForeground(1, getNotification(getExhibitedFileName() + " (Downloading...)"));
+                Toast.makeText(DownloadService.this,"Downloading...",Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -115,7 +116,7 @@ public class DownloadService extends Service {
                         file.delete();
 //                    getNotificationManager().cancel(1);
                     stopForeground(true);
-                    Toast.makeText(DownloadService.this, "Canceled", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DownloadService.this, "Download Canceled", Toast.LENGTH_SHORT).show();
                 }
             }
             resetNotificationConfig();
@@ -140,6 +141,15 @@ public class DownloadService extends Service {
             customFileName = filename;
         }
 
+        public void useDownloadProgressHintStyle(int style){
+            if(style != DownloadProgressHintStyle.FRACTION_STYLE
+                    && style != DownloadProgressHintStyle.PERCENT_STYLE
+                    && style != DownloadProgressHintStyle.FRACTION_AND_PERCENT_TOGETHER)
+                downloadProgressHintStyle = DownloadProgressHintStyle.FRACTION_STYLE;
+            else
+                downloadProgressHintStyle = style;
+        }
+
         public void setAsyncTaskNull(){
             if(downloadTask != null)
                 downloadTask = null;
@@ -151,7 +161,8 @@ public class DownloadService extends Service {
         return (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
     }
 
-    private Notification getNotification(String title, int progress){
+
+    private Notification getNotification(String title){
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
         if(useNotificationTargetActivity  && notificationTargetActivity != null) {
             Intent intent = new Intent(this, notificationTargetActivity);
@@ -165,9 +176,43 @@ public class DownloadService extends Service {
             builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), notificationLargeIconResId));
         }
         builder.setContentTitle(title);
-        if(progress > 0){
-            builder.setContentText(progress + "%");
-            builder.setProgress(100, progress, false);
+        builder.setWhen(notificationCreateTime);
+        return  builder.build();
+    }
+
+    private Notification getNotification(String title, int progress, float fileSize, String fileSizeUnit){
+        String stringFileSize = String.format("%.2f", fileSize);
+        String stringDownloadedFileSize = String.format("%.2f", fileSize * progress / 100);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+        if(useNotificationTargetActivity  && notificationTargetActivity != null) {
+            Intent intent = new Intent(this, notificationTargetActivity);
+            PendingIntent pi = PendingIntent.getActivity(this, 0, intent, 0);
+            builder.setContentIntent(pi);
+        }
+        if(useNotificationSmallIcon){
+            builder.setSmallIcon(notificationSmallIconResId);
+        }
+        if(useNotificationLargeIcon){
+            builder.setLargeIcon(BitmapFactory.decodeResource(getResources(), notificationLargeIconResId));
+        }
+        builder.setContentTitle(title);
+        if(downloadProgressHintStyle == DownloadProgressHintStyle.FRACTION_STYLE){
+            builder.setContentText(stringDownloadedFileSize + fileSizeUnit + "/" + stringFileSize+ fileSizeUnit);
+            if(progress > 0)
+                builder.setProgress(100, progress, false);
+        }else if(downloadProgressHintStyle == DownloadProgressHintStyle.PERCENT_STYLE){
+            if(progress > 0) {
+                builder.setContentText(progress + "%");
+                builder.setProgress(100, progress, false);
+            }
+        }else if(downloadProgressHintStyle == DownloadProgressHintStyle.FRACTION_AND_PERCENT_TOGETHER){
+            StringBuffer stringBuffer = new StringBuffer(stringDownloadedFileSize + fileSizeUnit + "/" + stringFileSize + fileSizeUnit);
+            if(progress > 0){
+                stringBuffer.append(" (" + progress + "%)");
+                builder.setProgress(100, progress, false);
+            }
+            builder.setContentText(stringBuffer.toString());
         }
         builder.setWhen(notificationCreateTime);
         return  builder.build();

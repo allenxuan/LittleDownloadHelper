@@ -97,6 +97,13 @@ public class LittleDownloadHelper {
         return this;
     }
 
+    public LittleDownloadHelper useDownloadProgressHintStyle(int style){
+        if(serviceConnectFlag){
+            downloadBinder.useDownloadProgressHintStyle(style);
+        }
+        return this;
+    }
+
     public LittleDownloadHelper setDownloadUrl(String downloadUrlComeIn){
         downloadUrl = downloadUrlComeIn;
         return this;

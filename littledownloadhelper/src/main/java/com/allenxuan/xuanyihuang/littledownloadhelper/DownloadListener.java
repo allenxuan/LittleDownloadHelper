@@ -5,7 +5,7 @@ package com.allenxuan.xuanyihuang.littledownloadhelper;
  */
 
 interface DownloadListener {
-    void onProgress(int progress);
+    void onProgress(int progress, float fileSize, String fileSizeUnit);
 
     void onSuccess();
 
