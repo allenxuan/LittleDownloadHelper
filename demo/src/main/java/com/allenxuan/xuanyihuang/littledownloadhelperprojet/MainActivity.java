@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
         littleDownloadHelper
         .setDownloadUrl(url)
                 .useNotificationSmallIcon(R.drawable.ic_notification)
+                .useNotificationLargeIcon(R.mipmap.ic_launcher)
                 .useNotificationTargetActivity(MainActivity.class)
                 .useDownloadProgressHintStyle(DownloadProgressHintStyle.FRACTION_AND_PERCENT_TOGETHER)
                 .startDownload();
