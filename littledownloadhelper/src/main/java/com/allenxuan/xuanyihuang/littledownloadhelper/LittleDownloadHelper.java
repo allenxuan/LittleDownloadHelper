@@ -76,7 +76,7 @@ public class LittleDownloadHelper {
     public void destroyDownloadService(){
             serviceHostContext.unbindService(serviceConnection);
             serviceHostContext.stopService(serviceIntent);
-            downloadBinder.cancelDownload();
+            downloadBinder.cancelDownload(true);
             downloadBinder = null;
             serviceConnectFlag = false;
     }
@@ -139,7 +139,7 @@ public class LittleDownloadHelper {
 
     public void cancelDownload(){
         if(serviceConnectFlag)
-            downloadBinder.cancelDownload();
+            downloadBinder.cancelDownload(false);
     }
 
 }

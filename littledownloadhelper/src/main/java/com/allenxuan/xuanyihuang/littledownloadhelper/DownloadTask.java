@@ -43,6 +43,8 @@ class DownloadTask extends AsyncTask<String, Integer, Integer> {
 
     private boolean isCanceled = false;
 
+    private boolean cancelAfterServiceDestroyed = false;
+
     private boolean isPaused = false;
 
     private int lastProgress;
@@ -122,7 +124,7 @@ class DownloadTask extends AsyncTask<String, Integer, Integer> {
                 if(savedFile != null){
                     savedFile.close();
                 }
-                if(isCanceled && file !=null){
+                if(isCanceled && file !=null && !cancelAfterServiceDestroyed){
                     file.delete();
                 }
             }catch (Exception e){
@@ -146,7 +148,8 @@ class DownloadTask extends AsyncTask<String, Integer, Integer> {
                 listener.onPaused();
                 break;
             case TYPE_CANCELED:
-                listener.onCanceled();
+                listener.onCanceled(cancelAfterServiceDestroyed);
+                cancelAfterServiceDestroyed = false;
                 break;
             default:
                 break;
@@ -166,8 +169,9 @@ class DownloadTask extends AsyncTask<String, Integer, Integer> {
         isPaused = true;
     }
 
-    public void cancelDownload(){
+    public void cancelDownload(boolean b){
         isCanceled = true;
+        cancelAfterServiceDestroyed = b;
     }
 
     private long getContentLength(String downloadUrl) throws IOException{

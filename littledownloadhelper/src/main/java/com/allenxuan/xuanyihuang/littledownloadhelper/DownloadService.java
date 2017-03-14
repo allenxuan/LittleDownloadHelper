@@ -78,10 +78,11 @@ public class DownloadService extends Service {
         }
 
         @Override
-        public void onCanceled() {
+        public void onCanceled(boolean cancelAfterServiceDestroyed) {
             downloadTask = null;
             stopForeground(true);
-            Toast.makeText(DownloadService.this, "Download Canceled", Toast.LENGTH_SHORT).show();
+            if(!cancelAfterServiceDestroyed)
+                Toast.makeText(DownloadService.this, "Download Canceled", Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -121,12 +122,12 @@ public class DownloadService extends Service {
                 downloadTask.pauseDownload();
         }
 
-        public void cancelDownload(){
+        public void cancelDownload(boolean cancelAfterServiceDestroyed){
             if(downloadTask != null)
-                downloadTask.cancelDownload();
+                downloadTask.cancelDownload(cancelAfterServiceDestroyed);
             else{
               //after paused, downloadTask is null
-                if(downloadUrl != null){
+                if(downloadUrl != null  && !cancelAfterServiceDestroyed){
                     String fileName = downloadUrl.substring(downloadUrl.lastIndexOf("/"));
                     String directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath();
                     File file = new File(directory + fileName);

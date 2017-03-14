@@ -29,5 +29,5 @@ interface DownloadListener {
 
     void onPaused();
 
-    void onCanceled();
+    void onCanceled(boolean cancelAfterServiceDestroyed);
 }
