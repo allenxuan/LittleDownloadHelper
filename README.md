@@ -6,7 +6,11 @@
 #### LittleDownloadHelper is a simple utility helping construct background download service on Android Platform.
 
 ## Screenshot
-![demo1](/art/littledownloadhelperdemo.gif)
+<a href="" target="_blank">
+  <img alt="demo"
+       src="/art/littledownloadhelperdemo.gif"
+       height="60%">
+</a>
 
 ## Gradle Dependency
 This library is available on JCenter, so you need add this to your project's build.gradle (usually it is already there by default).
